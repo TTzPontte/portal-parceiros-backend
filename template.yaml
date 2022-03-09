@@ -1,0 +1,133 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+
+
+
+Parameters:
+  AppId:
+    Type: String
+
+  Project:
+    Description: nome do Project
+    Type: String
+    Default: Pontte
+
+  Environment:
+    Description: ambiente de execucao do servico
+    Type: String
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+
+Conditions:
+  Prod: !Equals [ !Ref Environment, prod ]
+
+# https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Runtime: python3.8
+    MemorySize: 1024
+    Timeout: 120
+    Environment:
+      Variables:
+        PAERTNERS_DB: "Organization-aou76nv52bapbebq3uxerkfcce-staging"
+        API_ENDPOINT: !If [ Prod, 'api-parcerias.pontte.com.br', !Sub 'api-${Environment}-parcerias.pontte.com.br' ]
+    Tags:
+      Project: !Ref Project
+      Environment: !Ref Environment
+
+#  PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/${AppId}-${AWS::Region}-PermissionsBoundary'
+
+# Resources declares the AWS resources that you want to include in the stack
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
+Resources:
+  APIDomainName:
+    Type: "AWS::ApiGateway::DomainName"
+    Properties:
+      DomainName:
+        !If [ Prod, "api-parcerias.pontte.com.br", !Sub "api-${Environment}-parcerias.pontte.com.br" ]
+      CertificateArn: "arn:aws:acm:us-east-1:848638426587:certificate/639f5ab2-c77a-4f62-8250-c85716a6753f"
+
+  # Acessos para log
+  CloudWatchRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "apigateway.amazonaws.com"
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+
+  ApiGatewayAccount:
+    Type: AWS::ApiGateway::Account
+    Properties:
+      CloudWatchRoleArn: !GetAtt CloudWatchRole.Arn
+
+
+  PartnersApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub "PartnersApi-${Environment}"
+      StageName: !Ref Environment
+
+  Deployment:
+    Type: 'AWS::ApiGateway::Deployment'
+    Properties:
+      RestApiId: !Ref PartnersApi
+      Description: PartnersApi deployment
+      StageName: "v1"
+
+  PartnersApiMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: "Partners"
+      DomainName: !Ref APIDomainName
+      RestApiId: !Ref PartnersApi
+      Stage: !Ref Environment
+
+  GetAllFn:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      FunctionName: !Sub "${Project}-GetAllFn-${Environment}"
+      Description: Retorna um contrato.
+      CodeUri: src/PartnerOrganization/get_all
+      Handler: app.lambda_handler
+      Tracing: Active
+      Events:
+        api1:
+          Type: Api
+          Properties:
+            RestApiId: !Ref PartnersApi
+            Path: "/v1/"
+            Method: GET
+
+
+
+    # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
+#
+#  PartnersDB:
+#    Type: AWS::DynamoDB::Table
+#    Properties:
+#      TableName: !Sub "Partners.${Environment}"
+#      BillingMode: PAY_PER_REQUEST
+#      PointInTimeRecoverySpecification:
+#        PointInTimeRecoveryEnabled: !If [ Prod, true, false ]
+#      SSESpecification:
+#        SSEEnabled: true
+#      AttributeDefinitions:
+#        - AttributeName: id
+#          AttributeType: S
+#      KeySchema:
+#        - AttributeName: id
+#          KeyType: HASH
+#      Tags:
+#        - { Key: Project, Value: !Ref Project }
+#        - { Key: Environment, Value: !Ref Environment }
+#
