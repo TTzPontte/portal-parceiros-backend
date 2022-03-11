@@ -71,71 +71,72 @@ Resources:
       CloudWatchRoleArn: !GetAtt CloudWatchRole.Arn
 
 
-  PartnersApi:
+  LeadsApi:
     Type: AWS::Serverless::Api
     Properties:
-      Name: !Sub "PartnersApi-${Environment}"
+      Name: !Sub "LeadsApi-${Environment}"
       StageName: !Ref Environment
 
   Deployment:
     Type: 'AWS::ApiGateway::Deployment'
     Properties:
-      RestApiId: !Ref PartnersApi
-      Description: PartnersApi deployment
+      RestApiId: !Ref LeadsApi
+      Description: LeadsApi deployment
       StageName: "v1"
 
-  PartnersApiMapping:
+  LeadsApiMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
-      BasePath: "Partners"
+      BasePath: "Leads"
       DomainName: !Ref APIDomainName
-      RestApiId: !Ref PartnersApi
+      RestApiId: !Ref LeadsApi
       Stage: !Ref Environment
-
-#  GetAllFn:
-#    Type: "AWS::Serverless::Function"
-#    Properties:
-#      FunctionName: !Sub "${Project}-GetAllFn-${Environment}"
-#      Description: Retorna um contrato.
-#      CodeUri: src/PartnerOrganization/get_all
-#      Handler: app.lambda_handler
-#      Tracing: Active
-#      Events:
-#        api1:
-#          Type: Api
- #         Properties:
-  #          RestApiId: !Ref PartnersApi
-  #          Path: "/v1/"
-  #          Method: GET
-
-    # # API: Leads
-  LeadsApp:
-    Type: AWS::Serverless::Application
+  
+  GetAllLeadsFn:
+    Type: "AWS::Serverless::Function"
     Properties:
-      Location: ./leads_template.yaml
+      FunctionName: !Sub "${Project}-GetAllLeadsFn-${Environment}"
+      Description: Retorna todos os leads.
+      CodeUri: src/Lead/get_all
+      Handler: app.lambda_handler
+      Tracing: Active
+      Events:
+        api1:
+          Type: Api
+          Properties:
+            RestApiId: !Ref LeadsApi
+            Path: "/v1/leads"
+            Method: GET
 
-  
-  
+  GetLeadFn:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      FunctionName: !Sub "${Project}-GetLeadFn-${Environment}"
+      Description: Retorna um lead.
+      CodeUri: src/Lead/Get
+      Handler: app.lambda_handler
+      Tracing: Active
+      Events:
+        api1:
+          Type: Api
+          Properties:
+            RestApiId: !Ref LeadsApi
+            Path: "/v1/lead"
+            Method: GET
 
+  CreateLeadFn:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      FunctionName: !Sub "${Project}-CreateLeadFn-${Environment}"
+      Description: Cria um lead.
+      CodeUri: src/Lead/Create
+      Handler: app.lambda_handler
+      Tracing: Active
+      Events:
+        api1:
+          Type: Api
+          Properties:
+            RestApiId: !Ref LeadsApi
+            Path: "/v1/lead"
+            Method: POST
 
-    # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
-#
-#  PartnersDB:
-#    Type: AWS::DynamoDB::Table
-#    Properties:
-#      TableName: !Sub "Partners.${Environment}"
-#      BillingMode: PAY_PER_REQUEST
-#      PointInTimeRecoverySpecification:
-#        PointInTimeRecoveryEnabled: !If [ Prod, true, false ]
-#      SSESpecification:
-#        SSEEnabled: true
-#      AttributeDefinitions:
-#        - AttributeName: id
-#          AttributeType: S
-#      KeySchema:
-#        - AttributeName: id
-#          KeyType: HASH
-#      Tags:
-#        - { Key: Project, Value: !Ref Project }
-#        - { Key: Environment, Value: !Ref Environment }
-#
