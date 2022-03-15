@@ -5,13 +5,15 @@ Description: >-
 
 
 Parameters:
-  AppId:
-    Type: String
-
   Project:
     Description: nome do Project
     Type: String
     Default: Pontte
+
+  APIDomainName:
+    Description: nome da API
+    Type: String
+
 
   Environment:
     Description: ambiente de execucao do servico
@@ -43,46 +45,18 @@ Globals:
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
 Resources:
-  APIDomainName:
-    Type: "AWS::ApiGateway::DomainName"
-    Properties:
-      DomainName:
-        !If [ Prod, "api-parcerias.pontte.com.br", !Sub "api-${Environment}-parcerias.pontte.com.br" ]
-      CertificateArn: "arn:aws:acm:us-east-1:848638426587:certificate/639f5ab2-c77a-4f62-8250-c85716a6753f"
-
-  # Acessos para log
-  CloudWatchRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - "apigateway.amazonaws.com"
-            Action: "sts:AssumeRole"
-      ManagedPolicyArns:
-        - "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
-
-  ApiGatewayAccount:
-    Type: AWS::ApiGateway::Account
-    Properties:
-      CloudWatchRoleArn: !GetAtt CloudWatchRole.Arn
-
-
   LeadsApi:
     Type: AWS::Serverless::Api
     Properties:
       Name: !Sub "LeadsApi-${Environment}"
       StageName: !Ref Environment
 
-  Deployment:
-    Type: 'AWS::ApiGateway::Deployment'
-    Properties:
-      RestApiId: !Ref LeadsApi
-      Description: LeadsApi deployment
-      StageName: "v1"
+#  Deployment:
+#    Type: 'AWS::ApiGateway::Deployment'
+#    Properties:
+#      RestApiId: !Ref LeadsApi
+#      Description: LeadsApi deployment
+#      StageName: "v1"
 
   LeadsApiMapping:
     Type: AWS::ApiGateway::BasePathMapping
@@ -97,7 +71,7 @@ Resources:
     Properties:
       FunctionName: !Sub "${Project}-GetAllLeadsFn-${Environment}"
       Description: Retorna todos os leads.
-      CodeUri: src/Lead/get_all
+      CodeUri: get_all
       Handler: app.lambda_handler
       Tracing: Active
       Events:
@@ -113,7 +87,7 @@ Resources:
     Properties:
       FunctionName: !Sub "${Project}-GetLeadFn-${Environment}"
       Description: Retorna um lead.
-      CodeUri: src/Lead/Get
+      CodeUri: Get
       Handler: app.lambda_handler
       Tracing: Active
       Events:
@@ -129,7 +103,7 @@ Resources:
     Properties:
       FunctionName: !Sub "${Project}-CreateLeadFn-${Environment}"
       Description: Cria um lead.
-      CodeUri: src/Lead/Create
+      CodeUri: Create
       Handler: app.lambda_handler
       Tracing: Active
       Events:

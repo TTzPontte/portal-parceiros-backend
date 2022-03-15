@@ -1,0 +1,12 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "portal-parceiro-backend"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-16s0xrgyf24d2"
+s3_prefix = "portal-parceiro-backend"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Project=\"Pontte\" Environment=\"dev\""
+image_repositories = []

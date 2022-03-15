@@ -5,9 +5,6 @@ Description: >-
 
 
 Parameters:
-  AppId:
-    Type: String
-
   Project:
     Description: nome do Project
     Type: String
@@ -92,30 +89,33 @@ Resources:
       RestApiId: !Ref PartnersApi
       Stage: !Ref Environment
 
-#  GetAllFn:
-#    Type: "AWS::Serverless::Function"
-#    Properties:
-#      FunctionName: !Sub "${Project}-GetAllFn-${Environment}"
-#      Description: Retorna um contrato.
-#      CodeUri: src/PartnerOrganization/get_all
-#      Handler: app.lambda_handler
-#      Tracing: Active
-#      Events:
-#        api1:
-#          Type: Api
- #         Properties:
-  #          RestApiId: !Ref PartnersApi
-  #          Path: "/v1/"
-  #          Method: GET
+  GetAllFn:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      FunctionName: !Sub "${Project}-GetAllFn-${Environment}"
+      Description: Retorna um contrato.
+      CodeUri: src/PartnerOrganization/get_all
+      Handler: app.lambda_handler
+      Tracing: Active
+      Events:
+        api1:
+          Type: Api
+          Properties:
+            RestApiId: !Ref PartnersApi
+            Path: "/v1/"
+            Method: GET
 
     # # API: Leads
   LeadsApp:
     Type: AWS::Serverless::Application
     Properties:
-      Location: ./leads_template.yaml
+      Location: ./src/Lead/template.yaml
+      Parameters: 
+        Project: !Ref Project
+        Environment: !Ref Environment
+        APIDomainName: !Ref APIDomainName
 
-  
-  
+ 
 
 
     # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
