@@ -1,0 +1,107 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+
+
+
+Parameters:
+  StageName:
+    Description: nome do estagio na URL quando em producao
+    Type: String
+    Default: v1
+
+  Project:
+    Description: nome do Project
+    Type: String
+    Default: Pontte
+
+  BasePath:
+    Description: base path da API
+    Type: String
+    Default: partners
+
+  APIDomainName:
+    Description: nome da API
+    Type: String
+
+  Environment:
+    Description: ambiente de execucao do servico
+    Type: String
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+
+Conditions:
+  Prod: !Equals [ !Ref Environment, prod ]
+
+Globals:
+  Function:
+    Runtime: python3.8
+    MemorySize: 1024
+    Timeout: 120
+    Environment:
+      Variables:
+        PAERTNERS_DB: "Organization-aou76nv52bapbebq3uxerkfcce-staging"
+        API_ENDPOINT: !If [ Prod, 'api-parcerias.pontte.com.br', !Sub 'api-${Environment}-parcerias.pontte.com.br' ]
+    Tags:
+      Project: !Ref Project
+      Environment: !Ref Environment
+
+Resources:
+#  AztronicApi:
+#    Type: AWS::Serverless::Api
+#    Properties:
+#      Name: !Sub "AztronicApi-${Environment}"
+#      StageName: !If [ Prod, !Ref StageName, !Ref Environment ]
+#      Auth:
+#        Authorizers:
+#          CognitoAuthorizer:
+#            UserPoolArn: !Ref CognitoUserPoolArn
+#
+#    AztronicApiMapping:
+#      Type: AWS::ApiGateway::BasePathMapping
+#      Properties:
+#        BasePath: "aztronic"
+#        DomainName: !Ref APIDomainName
+#        RestApiId: !Ref AztronicApi
+#        Stage: !Ref AztronicApi.Stage
+
+
+  PartnersApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub "PartnersApi-${Environment}"
+      StageName: !If [ Prod, !Ref StageName, !Ref Environment ]
+
+  PartnersApiMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: !Ref BasePath
+      DomainName: !Ref APIDomainName
+      RestApiId: !Ref PartnersApi
+      Stage: !Ref PartnersApi.Stage
+
+#
+#  Deployment:
+#    Type: 'AWS::ApiGateway::Deployment'
+#    Properties:
+#      RestApiId: !Ref PartnersApi
+#      Description: PartnersApi deployment
+#      StageName: "v1"
+
+  GetAllFn:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      FunctionName: !Sub "${Project}-Partners-GetAllFn-${Environment}"
+      Description: Retorna um contrato.
+      CodeUri: get_all
+      Handler: app.lambda_handler
+      Tracing: Active
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: "/v1/partners/"
+            Method: GET
+            RestApiId: !Ref PartnersApi
