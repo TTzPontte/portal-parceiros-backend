@@ -5,13 +5,23 @@ Description: >-
 
 
 Parameters:
-  AppId:
-    Type: String
-
   Project:
     Description: nome do Project
     Type: String
     Default: Pontte
+  StageName:
+    Description: nome do estagio na URL quando em producao
+    Type: String
+    Default: v1
+
+  APIDomainName:
+    Description: nome da API
+    Type: String
+
+  BasePath:
+    Description: base path da API
+    Type: String
+    Default: Leads
 
   Environment:
     Description: ambiente de execucao do servico
@@ -24,7 +34,6 @@ Parameters:
 Conditions:
   Prod: !Equals [ !Ref Environment, prod ]
 
-# https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Runtime: python3.8
@@ -38,86 +47,65 @@ Globals:
       Project: !Ref Project
       Environment: !Ref Environment
 
-#  PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/${AppId}-${AWS::Region}-PermissionsBoundary'
-
-# Resources declares the AWS resources that you want to include in the stack
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
 Resources:
-  APIDomainName:
-    Type: "AWS::ApiGateway::DomainName"
-    Properties:
-      DomainName:
-        !If [ Prod, "api-parcerias.pontte.com.br", !Sub "api-${Environment}-parcerias.pontte.com.br" ]
-      CertificateArn: "arn:aws:acm:us-east-1:848638426587:certificate/639f5ab2-c77a-4f62-8250-c85716a6753f"
-
-  # Acessos para log
-  CloudWatchRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - "apigateway.amazonaws.com"
-            Action: "sts:AssumeRole"
-      ManagedPolicyArns:
-        - "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
-
-  ApiGatewayAccount:
-    Type: AWS::ApiGateway::Account
-    Properties:
-      CloudWatchRoleArn: !GetAtt CloudWatchRole.Arn
-
+  #  AztronicApi:
+  #    Type: AWS::Serverless::Api
+  #    Properties:
+  #      Name: !Sub "AztronicApi-${Environment}"
+  #      StageName: !If [ Prod, !Ref StageName, !Ref Environment ]
+  #      Auth:
+  #        Authorizers:
+  #          CognitoAuthorizer:
+  #            UserPoolArn: !Ref CognitoUserPoolArn
+  #
+  #    AztronicApiMapping:
+  #      Type: AWS::ApiGateway::BasePathMapping
+  #      Properties:
+  #        BasePath: "aztronic"
+  #        DomainName: !Ref APIDomainName
+  #        RestApiId: !Ref AztronicApi
+  #        Stage: !Ref AztronicApi.Stage
 
   LeadsApi:
     Type: AWS::Serverless::Api
     Properties:
       Name: !Sub "LeadsApi-${Environment}"
-      StageName: !Ref Environment
-
-  Deployment:
-    Type: 'AWS::ApiGateway::Deployment'
-    Properties:
-      RestApiId: !Ref LeadsApi
-      Description: LeadsApi deployment
-      StageName: "v1"
+      StageName: !If [ Prod, !Ref StageName, !Ref Environment ]
 
   LeadsApiMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
-      BasePath: "Leads"
+      BasePath: !Ref BasePath
       DomainName: !Ref APIDomainName
       RestApiId: !Ref LeadsApi
-      Stage: !Ref Environment
+      Stage: !Ref LeadsApi.Stage
   
   GetAllLeadsFn:
     Type: "AWS::Serverless::Function"
     Properties:
       FunctionName: !Sub "${Project}-GetAllLeadsFn-${Environment}"
       Description: Retorna todos os leads.
-      CodeUri: src/Lead/get_all
+      CodeUri: get_all
       Handler: app.lambda_handler
       Tracing: Active
       Events:
-        api1:
+        ApiEvent:
           Type: Api
           Properties:
-            RestApiId: !Ref LeadsApi
             Path: "/v1/leads"
             Method: GET
+            RestApiId: !Ref LeadsApi
 
   GetLeadFn:
     Type: "AWS::Serverless::Function"
     Properties:
       FunctionName: !Sub "${Project}-GetLeadFn-${Environment}"
       Description: Retorna um lead.
-      CodeUri: src/Lead/Get
+      CodeUri: Get
       Handler: app.lambda_handler
       Tracing: Active
       Events:
-        api1:
+        ApiEvent:
           Type: Api
           Properties:
             RestApiId: !Ref LeadsApi
@@ -129,11 +117,11 @@ Resources:
     Properties:
       FunctionName: !Sub "${Project}-CreateLeadFn-${Environment}"
       Description: Cria um lead.
-      CodeUri: src/Lead/Create
+      CodeUri: Create
       Handler: app.lambda_handler
       Tracing: Active
       Events:
-        api1:
+        ApiEvent:
           Type: Api
           Properties:
             RestApiId: !Ref LeadsApi

@@ -5,8 +5,10 @@ Description: >-
 
 
 Parameters:
-  AppId:
+  StageName:
+    Description: nome do estagio na URL quando em producao
     Type: String
+    Default: v1
 
   Project:
     Description: nome do Project
@@ -24,7 +26,6 @@ Parameters:
 Conditions:
   Prod: !Equals [ !Ref Environment, prod ]
 
-# https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Runtime: python3.8
@@ -38,16 +39,12 @@ Globals:
       Project: !Ref Project
       Environment: !Ref Environment
 
-#  PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/${AppId}-${AWS::Region}-PermissionsBoundary'
 
-# Resources declares the AWS resources that you want to include in the stack
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
 Resources:
   APIDomainName:
     Type: "AWS::ApiGateway::DomainName"
     Properties:
-      DomainName:
-        !If [ Prod, "api-parcerias.pontte.com.br", !Sub "api-${Environment}-parcerias.pontte.com.br" ]
+      DomainName: !If [ Prod, "api-parcerias.pontte.com.br", !Sub "api-${Environment}-parcerias.pontte.com.br" ]
       CertificateArn: "arn:aws:acm:us-east-1:848638426587:certificate/639f5ab2-c77a-4f62-8250-c85716a6753f"
 
   # Acessos para log
@@ -71,71 +68,24 @@ Resources:
       CloudWatchRoleArn: !GetAtt CloudWatchRole.Arn
 
 
-  PartnersApi:
-    Type: AWS::Serverless::Api
+  PartnersApp:
+    Type: AWS::Serverless::Application
     Properties:
-      Name: !Sub "PartnersApi-${Environment}"
-      StageName: !Ref Environment
+      Location: src/PartnerOrganization/template.yaml
+      Parameters:
+        Project: !Ref Project
+        Environment: !Ref Environment
+        APIDomainName: !Ref APIDomainName
+        BasePath: "partners"
 
-  Deployment:
-    Type: 'AWS::ApiGateway::Deployment'
-    Properties:
-      RestApiId: !Ref PartnersApi
-      Description: PartnersApi deployment
-      StageName: "v1"
 
-  PartnersApiMapping:
-    Type: AWS::ApiGateway::BasePathMapping
-    Properties:
-      BasePath: "Partners"
-      DomainName: !Ref APIDomainName
-      RestApiId: !Ref PartnersApi
-      Stage: !Ref Environment
-
-#  GetAllFn:
-#    Type: "AWS::Serverless::Function"
-#    Properties:
-#      FunctionName: !Sub "${Project}-GetAllFn-${Environment}"
-#      Description: Retorna um contrato.
-#      CodeUri: src/PartnerOrganization/get_all
-#      Handler: app.lambda_handler
-#      Tracing: Active
-#      Events:
-#        api1:
-#          Type: Api
- #         Properties:
-  #          RestApiId: !Ref PartnersApi
-  #          Path: "/v1/"
-  #          Method: GET
-
-    # # API: Leads
   LeadsApp:
     Type: AWS::Serverless::Application
     Properties:
-      Location: ./leads_template.yaml
+      Location: src/Lead/template.yaml
+      Parameters:
+        Project: !Ref Project
+        Environment: !Ref Environment
+        APIDomainName: !Ref APIDomainName
+        BasePath: "leads"
 
-  
-  
-
-
-    # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
-#
-#  PartnersDB:
-#    Type: AWS::DynamoDB::Table
-#    Properties:
-#      TableName: !Sub "Partners.${Environment}"
-#      BillingMode: PAY_PER_REQUEST
-#      PointInTimeRecoverySpecification:
-#        PointInTimeRecoveryEnabled: !If [ Prod, true, false ]
-#      SSESpecification:
-#        SSEEnabled: true
-#      AttributeDefinitions:
-#        - AttributeName: id
-#          AttributeType: S
-#      KeySchema:
-#        - AttributeName: id
-#          KeyType: HASH
-#      Tags:
-#        - { Key: Project, Value: !Ref Project }
-#        - { Key: Environment, Value: !Ref Environment }
-#
