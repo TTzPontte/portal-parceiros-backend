@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  Funcoes relacionadas ao Registro do usuário no portal do parceiro
+
+Parameters:
+  StageName:
+    Description: nome do estagio na URL quando em producao
+    Type: String
+    Default: v1
+
+  Project:
+    Description: nome do Project
+    Type: String
+    Default: Pontte
+
+  Environment:
+    Description: ambiente de execucao do servico
+    Type: String
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+
+  CognitoUserPoolId:
+    Description: Id do User Pool do Cognito
+    Type: String
+    Default: us-east-1_HzohDCg3k
+
+  UserInviteId:
+    Description: Id do User Pool do Cognito
+    Type: String
+    Default: 5wqmqox6yrcodgpnck4uzdl6by
+
+Globals:
+  Function:
+    Runtime: python3.8
+    MemorySize: 1024
+    Timeout: 120
+    Tags:
+      Project: !Ref Project
+      Environment: !Ref Environment
+
+Resources:
+  PosConfirmationFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Project}-PosConfirmationFn-${Environment}"
+      Description: Invoked automatically after a user has confirmed their account
+      CodeUri: pos_confirmation
+      Handler: app.lambda_handler
+      Tracing: Active
+      Environment:
+        Variables:
+          USERINVITE_DB: !Sub "UserInvite-${UserInviteId}-${Environment}"
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Sub "UserInvite-${UserInviteId}-${Environment}"
+        - Statement:
+            - Sid: "CognitoAdminAddUserToGroupPolicy"
+              Effect: Allow
+              Action:
+                - cognito-idp:AdminAddUserToGroup
+              Resource: !Sub "arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${CognitoUserPoolId}"

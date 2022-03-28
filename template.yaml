@@ -1,8 +1,6 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >-
-
-
 
 Parameters:
   StageName:
@@ -34,17 +32,26 @@ Globals:
     Environment:
       Variables:
         PAERTNERS_DB: "Organization-aou76nv52bapbebq3uxerkfcce-staging"
-        API_ENDPOINT: !If [ Prod, 'api-parcerias.pontte.com.br', !Sub 'api-${Environment}-parcerias.pontte.com.br' ]
+        API_ENDPOINT:
+          !If [
+            Prod,
+            "api-parcerias.pontte.com.br",
+            !Sub "api-${Environment}-parcerias.pontte.com.br",
+          ]
     Tags:
       Project: !Ref Project
       Environment: !Ref Environment
-
 
 Resources:
   APIDomainName:
     Type: "AWS::ApiGateway::DomainName"
     Properties:
-      DomainName: !If [ Prod, "api-parcerias.pontte.com.br", !Sub "api-${Environment}-parcerias.pontte.com.br" ]
+      DomainName:
+        !If [
+          Prod,
+          "api-parcerias.pontte.com.br",
+          !Sub "api-${Environment}-parcerias.pontte.com.br",
+        ]
       CertificateArn: "arn:aws:acm:us-east-1:848638426587:certificate/639f5ab2-c77a-4f62-8250-c85716a6753f"
 
   # Acessos para log
@@ -67,7 +74,6 @@ Resources:
     Properties:
       CloudWatchRoleArn: !GetAtt CloudWatchRole.Arn
 
-
   PartnersApp:
     Type: AWS::Serverless::Application
     Properties:
@@ -77,7 +83,6 @@ Resources:
         Environment: !Ref Environment
         APIDomainName: !Ref APIDomainName
         BasePath: "partners"
-
 
   LeadsApp:
     Type: AWS::Serverless::Application
@@ -89,3 +94,10 @@ Resources:
         APIDomainName: !Ref APIDomainName
         BasePath: "leads"
 
+  RegisterApp:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: src/Register/template.yaml
+      Parameters:
+        Project: !Ref Project
+        Environment: !Ref Environment
