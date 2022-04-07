@@ -1,0 +1,23 @@
+{
+  "version": "1",
+  "region": "us-east-1",
+  "userPoolId": "us-east-1_HzohDCg3k",
+  "userName": "f3136057-b049-42c9-8a7b-976c2a41b72d",
+  "callerContext": {
+    "awsSdkVersion": "aws-sdk-unknown-unknown",
+    "clientId": "mk8f6mdlhha6gh83bvv4vd92b"
+  },
+  "triggerSource": "PostConfirmation_ConfirmSignUp",
+  "request": {
+    "userAttributes": {
+      "sub": "f3136057-b049-42c9-8a7b-976c2a41b72d",
+      "custom:memberId": "b8e37cd4-1a3a-42f8-8440-0280ae0a3c46",
+      "email_verified": "true",
+      "cognito:user_status": "CONFIRMED",
+      "cognito:email_alias": "rafael.perina+2709@pontte.com.br",
+      "custom:organizationId": "d2d0c213-8e81-4955-a4ab-ffb38933690a",
+      "email": "rafael.perina+2709@pontte.com.br"
+    }
+  },
+  "response": {}
+}
