@@ -1,16 +1,14 @@
-import os
 import boto3
-client = boto3.client('cognito-idp')
+from helpers import sam
+
 dynamodb = boto3.resource("dynamodb")
 
-TABLE_USERINVITE = os.getenv('USERINVITE_DB')
+USERINVITE_TABLE_NAME = sam.get_user_invite_table_name()
 
-table_user_invite = dynamodb.Table(TABLE_USERINVITE)
-
+userinvite_table = dynamodb.Table(USERINVITE_TABLE_NAME)
 
 def get_user_invite_by_member_id(id):
-    response = table_user_invite.scan(
-        TableName=TABLE_USERINVITE,
+    response = userinvite_table.scan(
         FilterExpression='guestId = :guestId',
         ExpressionAttributeValues={
             ':guestId': id,
