@@ -22,8 +22,19 @@ Parameters:
       - staging
       - prod
 
+  CommonLayer:
+    Description: common resources for lambdas
+    Type: String
+
+  LibrariesLayer:
+    Description: common libraries for lambdas
+    Type: String
+
 Globals:
   Function:
+    Layers:
+      - !Ref CommonLayer
+      - !Ref LibrariesLayer
     Runtime: python3.8
     MemorySize: 1024
     Timeout: 120
@@ -46,7 +57,7 @@ Resources:
       Tracing: Active
       Policies:
         - DynamoDBReadPolicy:
-            TableName: !Sub '{{resolve:ssm:/userInvite/${Environment}:1}}'
+            TableName: !Sub "{{resolve:ssm:/userInvite/${Environment}:1}}"
         - Statement:
             - Sid: "CognitoAdminAddUserToGroupPolicy"
               Effect: Allow
@@ -54,6 +65,10 @@ Resources:
                 - cognito-idp:AdminAddUserToGroup
               Resource: !Sub "arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/{{resolve:ssm:/portalparceirofrontend/cognito/${Environment}:1}}"
         - SSMParameterReadPolicy:
-            ParameterName: !Sub 'userInvite/${Environment}'
+            ParameterName: !Sub "userInvite/${Environment}"
         - SSMParameterReadPolicy:
-            ParameterName: !Sub 'portalparceirofrontend/cognito/${Environment}'
+            ParameterName: !Sub "portalparceirofrontend/cognito/${Environment}"
+        - SSMParameterReadPolicy:
+            ParameterName: !Sub "portalparceirofrontend/api/${Environment}"
+        - SSMParameterReadPolicy:
+            ParameterName: !Sub "portalparceirofrontend/apikey/${Environment}"
