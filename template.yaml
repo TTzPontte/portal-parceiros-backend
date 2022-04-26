@@ -73,7 +73,7 @@ Resources:
     Type: AWS::ApiGateway::Account
     Properties:
       CloudWatchRoleArn: !GetAtt CloudWatchRole.Arn
-  
+
   LibrariesLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -122,3 +122,13 @@ Resources:
         CommonLayer: !Ref CommonLayer
         LibrariesLayer: !Ref LibrariesLayer
 
+  SimulationApp:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: src/Simulation/template.yaml
+      Parameters:
+        Project: !Ref Project
+        Environment: !Ref Environment
+        CommonLayer: !Ref CommonLayer
+        LibrariesLayer: !Ref LibrariesLayer
+        APIDomainName: !Ref APIDomainName
