@@ -1,0 +1,98 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  Funcoes relacionadas a validação do CEP no portal do parceiro
+
+Parameters:
+  StageName:
+    Description: nome do estagio na URL quando em producao
+    Type: String
+    Default: v1
+
+  Project:
+    Description: nome do Project
+    Type: String
+    Default: Pontte
+
+  Environment:
+    Description: ambiente de execucao do servico
+    Type: String
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+
+  CommonLayer:
+    Description: common resources for lambdas
+    Type: String
+
+  LibrariesLayer:
+    Description: common libraries for lambdas
+    Type: String
+
+  StageName:
+    Description: nome do estagio na URL quando em producao
+    Type: String
+    Default: v1
+
+  APIDomainName:
+    Description: nome da API
+    Type: String
+
+  BasePath:
+    Description: base path da API
+    Type: String
+    Default: cep
+
+Conditions:
+  Prod: !Equals [ !Ref Environment, prod ]
+
+Globals:
+  Function:
+    Layers:
+      - !Ref CommonLayer
+      - !Ref LibrariesLayer
+    Runtime: python3.8
+    MemorySize: 1024
+    Timeout: 120
+    Environment:
+      Variables:
+        ENV: !Ref Environment
+        PROJECT: !Ref Project
+    Tags:
+      Project: !Ref Project
+      Environment: !Ref Environment
+
+Resources:
+  CepApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub "${Project}-CepApi-${Environment}"
+      StageName: !If [ Prod, !Ref StageName, !Ref Environment ]
+
+  CepMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: !Ref BasePath
+      DomainName: !Ref APIDomainName
+      RestApiId: !Ref CepApi
+      Stage: !Ref CepApi.Stage
+
+  GetCepFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Project}-GetCepFn-${Environment}"
+      Description: function that receives a 'cep' and validates it based on Pontte's credit policy
+      CodeUri: Get
+      Handler: app.lambda_handler
+      Tracing: Active
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: "/v1/cep/{cep}"
+            Method: GET
+            RestApiId: !Ref CepApi
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Sub "CepGetFn-${Environment}"
