@@ -32,6 +32,10 @@ Parameters:
       - staging
       - prod
 
+  CognitoUserPoolArn:
+    Description: ARN do User Pool do Cognito
+    Type: String
+  
 Conditions:
   Prod: !Equals [ !Ref Environment, prod ]
 
@@ -47,6 +51,11 @@ Globals:
     Tags:
       Project: !Ref Project
       Environment: !Ref Environment
+  Api:
+    Cors:
+      AllowMethods: "'*'"
+      AllowHeaders: "'Authorization,Content-Type,If-Match'"
+      AllowOrigin: "'*'"
 
 Resources:
 #  AztronicApi:
@@ -73,6 +82,10 @@ Resources:
     Properties:
       Name: !Sub "PartnersApi-${Environment}"
       StageName: !If [ Prod, !Ref StageName, !Ref Environment ]
+      Auth:
+        Authorizers:
+          CognitoAuthorizer:
+              UserPoolArn: !Ref CognitoUserPoolArn
 
   PartnersApiMapping:
     Type: AWS::ApiGateway::BasePathMapping

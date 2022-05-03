@@ -1,0 +1,5 @@
+{
+  "CognitoUserPoolArn": "arn:aws:cognito-idp:us-east-1:848638426587:userpool/us-east-1_qdx4eLgLu",
+  "Environment": "dev",
+  "Project": "PortalDoParceiro"
+}
