@@ -122,3 +122,14 @@ Resources:
         CommonLayer: !Ref CommonLayer
         LibrariesLayer: !Ref LibrariesLayer
 
+  CepApp:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: src/Cep/template.yaml
+      Parameters:
+        Project: !Ref Project
+        Environment: !Ref Environment
+        CommonLayer: !Ref CommonLayer
+        LibrariesLayer: !Ref LibrariesLayer
+        APIDomainName: !Ref APIDomainName
+        BasePath: "cep"
