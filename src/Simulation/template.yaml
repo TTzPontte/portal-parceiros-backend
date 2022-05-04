@@ -1,0 +1,162 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  Funcoes relacionadas a Simuação do cliente no portal do parceiro
+Parameters:
+  StageName:
+    Description: nome do estagio na URL quando em producao
+    Type: String
+    Default: v1
+
+  Project:
+    Description: nome do Project
+    Type: String
+    Default: Pontte
+
+  Environment:
+    Description: ambiente de execucao do servico
+    Type: String
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+
+  CommonLayer:
+    Description: common resources for lambdas
+    Type: String
+
+  LibrariesLayer:
+    Description: common libraries for lambdas
+    Type: String
+
+  StageName:
+    Description: nome do estagio na URL quando em producao
+    Type: String
+    Default: v1
+
+  APIDomainName:
+    Description: nome da API
+    Type: String
+
+  BasePath:
+    Description: base path da API
+    Type: String
+    Default: Simulations
+
+Conditions:
+  Prod: !Equals [ !Ref Environment, prod ]
+
+Globals:
+  Function:
+    Layers:
+      - !Ref CommonLayer
+      - !Ref LibrariesLayer
+    Runtime: python3.8
+    MemorySize: 1024
+    Timeout: 120
+    Environment:
+      Variables:
+        ENV: !Ref Environment
+        PROJECT: !Ref Project
+    Tags:
+      Project: !Ref Project
+      Environment: !Ref Environment
+
+Resources:
+  SimulationsApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub "${Project}-SimulationsApi-${Environment}"
+      StageName: !If [ Prod, !Ref StageName, !Ref Environment ]
+
+  SimulationsMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: !Ref BasePath
+      DomainName: !Ref APIDomainName
+      RestApiId: !Ref SimulationsApi
+      Stage: !Ref SimulationsApi.Stage
+
+  GetSimulationsFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Project}-GetSimulationFn-${Environment}"
+      Description: function that get a simulation by id
+      CodeUri: Get
+      Handler: app.lambda_handler
+      Tracing: Active
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: "/v1/simulations/{id}"
+            Method: GET
+            RestApiId: !Ref SimulationsApi
+      Policies:
+        - SSMParameterReadPolicy:
+            ParameterName: !Sub "portalparceirofrontend/api/${Environment}"
+        - SSMParameterReadPolicy:
+            ParameterName: !Sub "portalparceirofrontend/apikey/${Environment}"
+
+  CreateSimulationsFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Project}-CreateSimulationsFn-${Environment}"
+      Description: function that create a simulation
+      CodeUri: Create
+      Handler: app.lambda_handler
+      Tracing: Active
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: "/v1/simulations"
+            Method: POST
+            RestApiId: !Ref SimulationsApi
+      Policies:
+        - SSMParameterReadPolicy:
+            ParameterName: !Sub "portalparceirofrontend/api/${Environment}"
+        - SSMParameterReadPolicy:
+            ParameterName: !Sub "portalparceirofrontend/apikey/${Environment}"
+
+  UpdateSimulationsFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Project}-UpdateSimulationsFn-${Environment}"
+      Description: function that update a simulation by id
+      CodeUri: Update
+      Handler: app.lambda_handler
+      Tracing: Active
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: "/v1/simulations/{id}"
+            Method: PATCH
+            RestApiId: !Ref SimulationsApi
+      Policies:
+        - SSMParameterReadPolicy:
+            ParameterName: !Sub "portalparceirofrontend/api/${Environment}"
+        - SSMParameterReadPolicy:
+            ParameterName: !Sub "portalparceirofrontend/apikey/${Environment}"
+
+  DeleteSimulationsFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Project}-DeleteSimulationsFn-${Environment}"
+      Description: function that delete a simulation by id
+      CodeUri: Delete
+      Handler: app.lambda_handler
+      Tracing: Active
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: "/v1/simulations/{id}"
+            Method: DELETE
+            RestApiId: !Ref SimulationsApi
+      Policies:
+        - SSMParameterReadPolicy:
+            ParameterName: !Sub "portalparceirofrontend/api/${Environment}"
+        - SSMParameterReadPolicy:
+            ParameterName: !Sub "portalparceirofrontend/apikey/${Environment}"

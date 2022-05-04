@@ -1,0 +1,5 @@
+# Running 
+# pip install --target . -r requirements.txt --ignore-installed
+
+# Requirements
+requests

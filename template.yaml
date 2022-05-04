@@ -74,6 +74,24 @@ Resources:
     Properties:
       CloudWatchRoleArn: !GetAtt CloudWatchRole.Arn
 
+  LibrariesLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub ${Project}-LibrariesLayer-${Environment}
+      Description: common libraries for lambdas
+      ContentUri: layers/libraries
+      CompatibleRuntimes:
+        - python3.8
+
+  CommonLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub ${Project}-CommonLayer-${Environment}
+      Description: common resources for lambdas
+      ContentUri: layers/common
+      CompatibleRuntimes:
+        - python3.8
+
   PartnersApp:
     Type: AWS::Serverless::Application
     Properties:
@@ -101,3 +119,29 @@ Resources:
       Parameters:
         Project: !Ref Project
         Environment: !Ref Environment
+        CommonLayer: !Ref CommonLayer
+        LibrariesLayer: !Ref LibrariesLayer
+
+  SimulationApp:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: src/Simulation/template.yaml
+      Parameters:
+        Project: !Ref Project
+        Environment: !Ref Environment
+        CommonLayer: !Ref CommonLayer
+        LibrariesLayer: !Ref LibrariesLayer
+        APIDomainName: !Ref APIDomainName
+        BasePath: "simulations"
+
+  CepApp:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: src/Cep/template.yaml
+      Parameters:
+        Project: !Ref Project
+        Environment: !Ref Environment
+        CommonLayer: !Ref CommonLayer
+        LibrariesLayer: !Ref LibrariesLayer
+        APIDomainName: !Ref APIDomainName
+        BasePath: "cep"
