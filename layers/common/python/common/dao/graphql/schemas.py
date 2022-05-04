@@ -256,5 +256,79 @@ schemas = {
                   updatedAt
                 }
               }"""
+    },
+    "Simulation": {
+        "get": """query getSimulation($id: ID!) {
+                  getSimulation(id: $id) {
+                    _deleted
+                    _lastChangedAt
+                    _version
+                    createdAt
+                    gracePeriod
+                    id
+                    linkPDFSimulation
+                    loanDate
+                    loanValue
+                    monthlyIncome
+                    owner
+                    skipMonth
+                    updatedAt
+                    propertyValue
+                  }
+                }
+                """,
+        "create": """mutation createSimulation($input: CreateSimulationInput!) {
+                    createSimulation (input: $input){
+                      _lastChangedAt
+                      _version
+                      createdAt
+                      id
+                      gracePeriod
+                      linkPDFSimulation
+                      loanDate
+                      monthlyIncome
+                      loanValue
+                      owner
+                      propertyValue
+                      skipMonth
+                      updatedAt
+                    }
+                  }""",
+        "update": """mutation updateSimulation($input: UpdateSimulationInput!) {
+                    updateSimulation(input: $input) {
+                      skipMonth
+                      propertyValue
+                      owner
+                      monthlyIncome
+                      updatedAt
+                      loanValue
+                      loanDate
+                      linkPDFSimulation
+                      id
+                      gracePeriod
+                      createdAt
+                      _version
+                      _lastChangedAt
+                      _deleted
+                    }
+                  }""",
+        "delete": """mutation deleteSimulation($input: DeleteSimulationInput!) {
+                      deleteSimulation(input: $input) {
+                        _deleted
+                        _lastChangedAt
+                        _version
+                        createdAt
+                        gracePeriod
+                        id
+                        updatedAt
+                        skipMonth
+                        propertyValue
+                        owner
+                        monthlyIncome
+                        loanValue
+                        loanDate
+                        linkPDFSimulation
+                      }
+                    }"""
     }
 }

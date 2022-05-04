@@ -1,8 +1,7 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >-
-
-
+  Funcoes relacionadas a validação do CEP no portal do parceiro
 
 Parameters:
   StageName:
@@ -15,15 +14,6 @@ Parameters:
     Type: String
     Default: Pontte
 
-  BasePath:
-    Description: base path da API
-    Type: String
-    Default: partners
-
-  APIDomainName:
-    Description: nome da API
-    Type: String
-
   Environment:
     Description: ambiente de execucao do servico
     Type: String
@@ -32,22 +22,47 @@ Parameters:
       - staging
       - prod
 
+  CommonLayer:
+    Description: common resources for lambdas
+    Type: String
+
+  LibrariesLayer:
+    Description: common libraries for lambdas
+    Type: String
+
+  StageName:
+    Description: nome do estagio na URL quando em producao
+    Type: String
+    Default: v1
+
+  APIDomainName:
+    Description: nome da API
+    Type: String
+
+  BasePath:
+    Description: base path da API
+    Type: String
+    Default: cep
+
   CognitoUserPoolArn:
     Description: ARN do User Pool do Cognito
     Type: String
-  
+
 Conditions:
   Prod: !Equals [ !Ref Environment, prod ]
 
 Globals:
   Function:
+    Layers:
+      - !Ref CommonLayer
+      - !Ref LibrariesLayer
     Runtime: python3.8
     MemorySize: 1024
     Timeout: 120
     Environment:
       Variables:
-        PAERTNERS_DB: "Organization-aou76nv52bapbebq3uxerkfcce-staging"
-        API_ENDPOINT: !If [ Prod, 'api-parcerias.pontte.com.br', !Sub 'api-${Environment}-parcerias.pontte.com.br' ]
+        ENV: !Ref Environment
+        PROJECT: !Ref Project
     Tags:
       Project: !Ref Project
       Environment: !Ref Environment
@@ -58,47 +73,41 @@ Globals:
       AllowOrigin: "'*'"
 
 Resources:
-
-  PartnersApi:
+  CepApi:
     Type: AWS::Serverless::Api
     Properties:
-      Name: !Sub "PartnersApi-${Environment}"
+      Name: !Sub "${Project}-CepApi-${Environment}"
       StageName: !If [ Prod, !Ref StageName, !Ref Environment ]
       Auth:
         Authorizers:
           CognitoAuthorizer:
               UserPoolArn: !Ref CognitoUserPoolArn
 
-  PartnersApiMapping:
+  CepMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
       BasePath: !Ref BasePath
       DomainName: !Ref APIDomainName
-      RestApiId: !Ref PartnersApi
-      Stage: !Ref PartnersApi.Stage
+      RestApiId: !Ref CepApi
+      Stage: !Ref CepApi.Stage
 
-#
-#  Deployment:
-#    Type: 'AWS::ApiGateway::Deployment'
-#    Properties:
-#      RestApiId: !Ref PartnersApi
-#      Description: PartnersApi deployment
-#      StageName: "v1"
-
-  GetAllFn:
-    Type: "AWS::Serverless::Function"
+  GetCepFn:
+    Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${Project}-Partners-GetAllFn-${Environment}"
-      Description: Retorna um contrato.
-      CodeUri: get_all
+      FunctionName: !Sub "${Project}-GetCepFn-${Environment}"
+      Description: function that receives a 'cep' and validates it based on Pontte's credit policy
+      CodeUri: Get
       Handler: app.lambda_handler
       Tracing: Active
       Events:
         ApiEvent:
           Type: Api
           Properties:
-            Path: "/v1/partners/"
+            RestApiId: !Ref CepApi
+            Path: "/v1/cep/{cep}"
             Method: GET
-            RestApiId: !Ref PartnersApi
             Auth:
-              Authorizer: CognitoAuthorizer
+              Authorizer: CognitoAuthorizer            
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Sub "CepGetFn-${Environment}"
