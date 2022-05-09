@@ -44,6 +44,10 @@ Parameters:
     Type: String
     Default: cep
 
+  CognitoUserPoolArn:
+    Description: ARN do User Pool do Cognito
+    Type: String
+
 Conditions:
   Prod: !Equals [ !Ref Environment, prod ]
 
@@ -62,6 +66,11 @@ Globals:
     Tags:
       Project: !Ref Project
       Environment: !Ref Environment
+  Api:
+    Cors:
+      AllowMethods: "'*'"
+      AllowHeaders: "'Authorization,Content-Type,If-Match'"
+      AllowOrigin: "'*'"
 
 Resources:
   CepApi:
@@ -69,6 +78,10 @@ Resources:
     Properties:
       Name: !Sub "${Project}-CepApi-${Environment}"
       StageName: !If [ Prod, !Ref StageName, !Ref Environment ]
+      Auth:
+        Authorizers:
+          CognitoAuthorizer:
+              UserPoolArn: !Ref CognitoUserPoolArn
 
   CepMapping:
     Type: AWS::ApiGateway::BasePathMapping
@@ -90,9 +103,11 @@ Resources:
         ApiEvent:
           Type: Api
           Properties:
+            RestApiId: !Ref CepApi
             Path: "/v1/cep/{cep}"
             Method: GET
-            RestApiId: !Ref CepApi
+            Auth:
+              Authorizer: CognitoAuthorizer            
       Policies:
         - LambdaInvokePolicy:
             FunctionName: !Sub "CepGetFn-${Environment}"

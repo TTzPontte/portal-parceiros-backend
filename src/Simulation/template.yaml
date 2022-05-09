@@ -43,6 +43,10 @@ Parameters:
     Type: String
     Default: Simulations
 
+  CognitoUserPoolArn:
+    Description: ARN do User Pool do Cognito
+    Type: String
+
 Conditions:
   Prod: !Equals [ !Ref Environment, prod ]
 
@@ -61,6 +65,11 @@ Globals:
     Tags:
       Project: !Ref Project
       Environment: !Ref Environment
+  Api:
+    Cors:
+      AllowMethods: "'*'"
+      AllowHeaders: "'Authorization,Content-Type,If-Match'"
+      AllowOrigin: "'*'"
 
 Resources:
   SimulationsApi:
@@ -68,6 +77,10 @@ Resources:
     Properties:
       Name: !Sub "${Project}-SimulationsApi-${Environment}"
       StageName: !If [ Prod, !Ref StageName, !Ref Environment ]
+      Auth:
+        Authorizers:
+          CognitoAuthorizer:
+              UserPoolArn: !Ref CognitoUserPoolArn
 
   SimulationsMapping:
     Type: AWS::ApiGateway::BasePathMapping
@@ -92,6 +105,8 @@ Resources:
             Path: "/v1/simulations/{id}"
             Method: GET
             RestApiId: !Ref SimulationsApi
+            Auth:
+              Authorizer: CognitoAuthorizer
       Policies:
         - SSMParameterReadPolicy:
             ParameterName: !Sub "portalparceirofrontend/api/${Environment}"
@@ -113,6 +128,8 @@ Resources:
             Path: "/v1/simulations"
             Method: POST
             RestApiId: !Ref SimulationsApi
+            Auth:
+              Authorizer: CognitoAuthorizer
       Policies:
         - SSMParameterReadPolicy:
             ParameterName: !Sub "portalparceirofrontend/api/${Environment}"
@@ -134,6 +151,8 @@ Resources:
             Path: "/v1/simulations/{id}"
             Method: PATCH
             RestApiId: !Ref SimulationsApi
+            Auth:
+              Authorizer: CognitoAuthorizer
       Policies:
         - SSMParameterReadPolicy:
             ParameterName: !Sub "portalparceirofrontend/api/${Environment}"
@@ -155,6 +174,8 @@ Resources:
             Path: "/v1/simulations/{id}"
             Method: DELETE
             RestApiId: !Ref SimulationsApi
+            Auth:
+              Authorizer: CognitoAuthorizer
       Policies:
         - SSMParameterReadPolicy:
             ParameterName: !Sub "portalparceirofrontend/api/${Environment}"

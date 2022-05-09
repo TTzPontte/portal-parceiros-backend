@@ -30,6 +30,27 @@ Parameters:
     Description: common libraries for lambdas
     Type: String
 
+  StageName:
+    Description: nome do estagio na URL quando em producao
+    Type: String
+    Default: v1
+
+  APIDomainName:
+    Description: nome da API
+    Type: String
+
+  BasePath:
+    Description: base path da API
+    Type: String
+    Default: register
+
+  CognitoUserPoolArn:
+    Description: ARN do User Pool do Cognito
+    Type: String
+
+Conditions:
+  Prod: !Equals [ !Ref Environment, prod ]
+
 Globals:
   Function:
     Layers:
@@ -45,8 +66,54 @@ Globals:
     Tags:
       Project: !Ref Project
       Environment: !Ref Environment
+  Api:
+    Cors:
+      AllowMethods: "'*'"
+      AllowHeaders: "'Authorization,Content-Type,If-Match'"
+      AllowOrigin: "'*'"
 
 Resources:
+  RegisterApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub "${Project}-RegisterApi-${Environment}"
+      StageName: !If [ Prod, !Ref StageName, !Ref Environment ]
+      Auth:
+        Authorizers:
+          CognitoAuthorizer:
+              UserPoolArn: !Ref CognitoUserPoolArn
+
+  RegisterMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: !Ref BasePath
+      DomainName: !Ref APIDomainName
+      RestApiId: !Ref RegisterApi
+      Stage: !Ref RegisterApi.Stage
+
+  InvitationFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Project}-InvitationFn-${Environment}"
+      Description: function that does a register action or decline in user's invitation
+      CodeUri: invite
+      Handler: app.lambda_handler
+      Tracing: Active
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref RegisterApi
+            Path: "/v1/register/invite"
+            Method: POST
+            Auth:
+              Authorizer: CognitoAuthorizer
+      Policies:
+        - SSMParameterReadPolicy:
+            ParameterName: !Sub "portalparceirofrontend/api/${Environment}"
+        - SSMParameterReadPolicy:
+            ParameterName: !Sub "portalparceirofrontend/apikey/${Environment}"
+
   PosConfirmationFn:
     Type: AWS::Serverless::Function
     Properties:

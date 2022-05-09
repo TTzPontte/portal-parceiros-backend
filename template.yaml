@@ -20,6 +20,10 @@ Parameters:
       - dev
       - staging
       - prod
+  
+  CognitoUserPoolArn:
+    Description: ARN do User Pool do Cognito
+    Type: String
 
 Conditions:
   Prod: !Equals [ !Ref Environment, prod ]
@@ -101,6 +105,7 @@ Resources:
         Environment: !Ref Environment
         APIDomainName: !Ref APIDomainName
         BasePath: "partners"
+        CognitoUserPoolArn: !Ref CognitoUserPoolArn
 
   LeadsApp:
     Type: AWS::Serverless::Application
@@ -111,6 +116,7 @@ Resources:
         Environment: !Ref Environment
         APIDomainName: !Ref APIDomainName
         BasePath: "leads"
+        CognitoUserPoolArn: !Ref CognitoUserPoolArn
 
   RegisterApp:
     Type: AWS::Serverless::Application
@@ -121,6 +127,9 @@ Resources:
         Environment: !Ref Environment
         CommonLayer: !Ref CommonLayer
         LibrariesLayer: !Ref LibrariesLayer
+        APIDomainName: !Ref APIDomainName
+        BasePath: "register"
+        CognitoUserPoolArn: !Ref CognitoUserPoolArn
 
   SimulationApp:
     Type: AWS::Serverless::Application
@@ -133,6 +142,7 @@ Resources:
         LibrariesLayer: !Ref LibrariesLayer
         APIDomainName: !Ref APIDomainName
         BasePath: "simulations"
+        CognitoUserPoolArn: !Ref CognitoUserPoolArn
 
   CepApp:
     Type: AWS::Serverless::Application
@@ -145,3 +155,4 @@ Resources:
         LibrariesLayer: !Ref LibrariesLayer
         APIDomainName: !Ref APIDomainName
         BasePath: "cep"
+        CognitoUserPoolArn: !Ref CognitoUserPoolArn
