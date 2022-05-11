@@ -110,8 +110,6 @@ Resources:
       Policies:
         - SSMParameterReadPolicy:
             ParameterName: !Sub "portalparceirofrontend/api/${Environment}"
-        - SSMParameterReadPolicy:
-            ParameterName: !Sub "portalparceirofrontend/apikey/${Environment}"
 
   CreateSimulationsFn:
     Type: AWS::Serverless::Function
@@ -133,8 +131,6 @@ Resources:
       Policies:
         - SSMParameterReadPolicy:
             ParameterName: !Sub "portalparceirofrontend/api/${Environment}"
-        - SSMParameterReadPolicy:
-            ParameterName: !Sub "portalparceirofrontend/apikey/${Environment}"
 
   UpdateSimulationsFn:
     Type: AWS::Serverless::Function
@@ -156,8 +152,6 @@ Resources:
       Policies:
         - SSMParameterReadPolicy:
             ParameterName: !Sub "portalparceirofrontend/api/${Environment}"
-        - SSMParameterReadPolicy:
-            ParameterName: !Sub "portalparceirofrontend/apikey/${Environment}"
 
   DeleteSimulationsFn:
     Type: AWS::Serverless::Function
@@ -179,5 +173,4 @@ Resources:
       Policies:
         - SSMParameterReadPolicy:
             ParameterName: !Sub "portalparceirofrontend/api/${Environment}"
-        - SSMParameterReadPolicy:
-            ParameterName: !Sub "portalparceirofrontend/apikey/${Environment}"
+

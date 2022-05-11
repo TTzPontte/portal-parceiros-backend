@@ -6,9 +6,10 @@ from common.dao.graphql.gql_client import GqlClient
 @dataclass
 class GqlDAO:
     table_name: str
+    authorization: str
 
     def __post_init__(self):
-        self._client = GqlClient()
+        self._client = GqlClient(self.authorization)
         self._schema = schemas[self.table_name]
 
     def get(self, id):

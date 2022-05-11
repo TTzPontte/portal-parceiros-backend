@@ -4,10 +4,11 @@ import json
 def lambda_handler(event, context):
     try:
         body = event.get('body', None) 
+        token = event["headers"]["Authorization"]
 
         payload = json.loads(body) if isinstance(body, str) else body
        
-        simulation = GqlDAO('Simulation')  
+        simulation = GqlDAO(authorization=token, table_name='Simulation')  
  
         response = simulation.create(payload) 
     
