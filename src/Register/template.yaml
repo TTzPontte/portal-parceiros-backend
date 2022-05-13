@@ -111,8 +111,6 @@ Resources:
       Policies:
         - SSMParameterReadPolicy:
             ParameterName: !Sub "portalparceirofrontend/api/${Environment}"
-        - SSMParameterReadPolicy:
-            ParameterName: !Sub "portalparceirofrontend/apikey/${Environment}"
 
   PosConfirmationFn:
     Type: AWS::Serverless::Function
@@ -137,5 +135,4 @@ Resources:
             ParameterName: !Sub "portalparceirofrontend/cognito/${Environment}"
         - SSMParameterReadPolicy:
             ParameterName: !Sub "portalparceirofrontend/api/${Environment}"
-        - SSMParameterReadPolicy:
-            ParameterName: !Sub "portalparceirofrontend/apikey/${Environment}"
+
