@@ -82,6 +82,24 @@ Resources:
         Authorizers:
           CognitoAuthorizer:
               UserPoolArn: !Ref CognitoUserPoolArn
+      GatewayResponses:
+        DEFAULT_4xx:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Headers: "'*'"
+              Access-Control-Allow-Origin: "'*'"
+
+        DEFAULT_5XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Headers: "'*'"
+              Access-Control-Allow-Origin: "'*'"
+
+        EXPIRED_TOKEN:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Headers: "'*'"
+              Access-Control-Allow-Origin: "'*'"
 
   CepMapping:
     Type: AWS::ApiGateway::BasePathMapping

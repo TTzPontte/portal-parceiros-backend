@@ -14,6 +14,8 @@ def lambda_handler(event, context):
     response = table.put_item(Item=data)
     return {
         'statusCode': 201,
-        'headers': {},
+        'headers': {
+            'Access-Control-Allow-Origin': '*',
+        },
         'body': json.dumps({'id': response["id"]})
     }
