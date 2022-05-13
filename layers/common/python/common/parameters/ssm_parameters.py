@@ -11,9 +11,6 @@ class SSMParameters:
     def get_graphql_url_portal(self):
         return self.ssm_dao.get_ssm_parameter_value(ssm_name=f'/portalparceirofrontend/api/{self.ENV}')
 
-    def get_graphql_api_key_portal(self):
-        return self.ssm_dao.get_ssm_parameter_value(ssm_name=f'/portalparceirofrontend/apikey/{self.ENV}')
-
     def get_user_invite_table_name(self):
         return self.ssm_dao.get_ssm_parameter_value(ssm_name=f'/userInvite/{self.ENV}')
 
