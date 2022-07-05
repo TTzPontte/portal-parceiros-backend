@@ -156,3 +156,16 @@ Resources:
         APIDomainName: !Ref APIDomainName
         BasePath: "cep"
         CognitoUserPoolArn: !Ref CognitoUserPoolArn
+
+  WhiteLabelApp:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: src/WhiteLabel/template.yaml
+      Parameters:
+        Project: !Ref Project
+        Environment: !Ref Environment
+        CommonLayer: !Ref CommonLayer
+        LibrariesLayer: !Ref LibrariesLayer
+        APIDomainName: !Ref APIDomainName
+        BasePath: "whitelabel"
+        CognitoUserPoolArn: !Ref CognitoUserPoolArn

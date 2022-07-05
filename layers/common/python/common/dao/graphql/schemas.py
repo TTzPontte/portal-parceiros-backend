@@ -330,5 +330,102 @@ schemas = {
                         linkPDFSimulation
                       }
                     }"""
+    },
+    "WhiteLabel": {
+        "get": """query getWhiteLabel($id: ID!) {
+                        getWhiteLabel(id: $id) {
+                          _deleted
+                          _lastChangedAt
+                          _version
+                          active
+                          background
+                          createdAt
+                          id
+                          logo
+                          owner
+                          partnerName
+                          path
+                          primary
+                          secondary
+                          tertiary
+                          type
+                          updatedAt
+                          whiteLabelOrganizationId
+                        }
+                      }
+                """,
+        "list": """
+          query listWhiteLabels {
+                  listWhiteLabels {
+                    items {
+                      whiteLabelOrganizationId
+                      updatedAt
+                      type
+                      tertiary
+                      secondary
+                      primary
+                      path
+                      partnerName
+                      owner
+                      logo
+                      id
+                      createdAt
+                      background
+                      active
+                      _version
+                      _lastChangedAt
+                      _deleted
+                    }
+                  }
+                }
+        """,
+        "create": """mutation CreateWhiteLabel($input: CreateWhiteLabelInput!) {
+                      createWhiteLabel(input: $input) {
+                        tertiary
+                        type
+                        updatedAt
+                        whiteLabelOrganizationId
+                        secondary
+                        primary
+                        path
+                        partnerName
+                        owner
+                        logo
+                        id
+                        createdAt
+                        background
+                        active
+                        _version
+                        _lastChangedAt
+                        _deleted
+                      }
+                    }
+                    """,
+        "update": """mutation MyMutation($input: UpdateWhiteLabelInput!) {
+                updateWhiteLabel(input: $input) {
+                  updatedAt
+                  type
+                  tertiary
+                  secondary
+                  primary
+                  path
+                  partnerName
+                  owner
+                  logo
+                  id
+                  createdAt
+                  background
+                  active
+                  _version
+                  _lastChangedAt
+                  _deleted
+                }
+              }""",
+        "delete": """mutation MyMutation($input: DeleteWhiteLabelInput!) {
+                    deleteWhiteLabel(input: $input){
+                      id
+                    }
+                  }
+                """
     }
 }
