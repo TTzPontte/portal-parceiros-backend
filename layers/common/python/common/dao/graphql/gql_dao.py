@@ -26,6 +26,11 @@ class GqlDAO:
 
         return response
 
+    def getAll(self):
+        response = self._client.post(self._schema["list"], {})
+        
+        return response
+
     def create(self, input):
         return self._client.post(self._schema["create"], {"input": input})
 
