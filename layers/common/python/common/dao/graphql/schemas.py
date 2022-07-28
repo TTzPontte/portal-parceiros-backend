@@ -34,6 +34,10 @@ schemas = {
                         id
                         organizationId
                         status
+                        updatedAt
+                        createdAt
+                        _lastChangedAt
+                         _version
                       }
                     }
                 """,
