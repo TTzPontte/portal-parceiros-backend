@@ -17,6 +17,7 @@ Parameters:
     Description: ambiente de execucao do servico
     Type: String
     AllowedValues:
+      - test
       - dev
       - staging
       - prod

@@ -18,6 +18,7 @@ Parameters:
     Description: ambiente de execucao do servico
     Type: String
     AllowedValues:
+      - test
       - dev
       - staging
       - prod
@@ -29,11 +30,6 @@ Parameters:
   LibrariesLayer:
     Description: common libraries for lambdas
     Type: String
-
-  StageName:
-    Description: nome do estagio na URL quando em producao
-    Type: String
-    Default: v1
 
   APIDomainName:
     Description: nome da API
