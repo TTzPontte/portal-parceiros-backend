@@ -3,15 +3,18 @@ schemas = {
     "UserInvite": {
         "get":  """query getUserInvite($id: ID!) {
                     getUserInvite(id: $id) {
-                      authType
-                      guestId
-                      hostId
-                      id
-                      organizationId
-                      status
-                      createdAt
-                      _version
-                      _deleted
+                        authType
+                        createdAt
+                        guestId
+                        hostId
+                        id
+                        owner
+                        status
+                        organizationId
+                        updatedAt
+                        _lastChangedAt
+                        _version
+                        _deleted
                     }
                   }
                 """,
@@ -19,35 +22,49 @@ schemas = {
                       createUserInvite(input: $input) {
                         authType
                         guestId
-                        hostId
-                        id
-                        organizationId
+                        createdAt
+                        _version
+                        _lastChangedAt
+                        _deleted
+                        updatedAt
                         status
-                      }
+                        owner
+                        organizationId
+                        id
+                        hostId
                     }
                   """,
         "update": """mutation updateUserInvite($input: UpdateUserInviteInput!) {
                       updateUserInvite(input: $input) {
                         authType
                         guestId
-                        hostId
-                        id
-                        organizationId
+                        createdAt
+                        _version
+                        _lastChangedAt
+                        _deleted
+                        updatedAt
                         status
+                        owner
+                        organizationId
+                        id
+                        hostId
                       }
                     }
                 """,
         "delete": """mutation MyMutation($input: DeleteUserInviteInput!) {
                       deleteUserInvite(input: $input) {
+                        authType
+                        guestId
+                        createdAt
+                        _version
+                        _lastChangedAt
+                        _deleted
+                        updatedAt
                         status
+                        owner
                         organizationId
                         id
                         hostId
-                        guestId
-                        createdAt
-                        updatedAt
-                        _version
-                        _deleted
                       }
                     }
                 """
@@ -58,60 +75,69 @@ schemas = {
                     _deleted
                     _lastChangedAt
                     _version
-                    createdAt
                     documentNumber
+                    createdAt
                     id
-                    legalName
+                    image
                     name
+                    legalName
+                    owner
                     phone
-                    updatedAt
                     pipefyId
+                    updatedAt
                   }
                 }  
               """,
         "create": """mutation createOrganization($input: CreateOrganizationInput!) {
                       createOrganization(input: $input) {
+                        _deleted
+                        _lastChangedAt
+                        _version
+                        documentNumber
+                        createdAt
+                        id
+                        image
+                        name
+                        legalName
+                        owner
                         phone
                         pipefyId
                         updatedAt
-                        name
-                        legalName
-                        id
-                        documentNumber
-                        createdAt
-                        _version
-                        _lastChangedAt
-                        _deleted
                       }
                     }
                   """,
         "update": """mutation updateOrganization($input: UpdateOrganizationInput!) {
                       updateOrganization(input: $input) {
-                        name
-                        legalName
-                        id
+                        _deleted
+                        _lastChangedAt
+                        _version
                         documentNumber
                         createdAt
-                        _version
-                        _lastChangedAt
-                        _deleted
-                        updatedAt
-                        pipefyId
+                        id
+                        image
+                        name
+                        legalName
+                        owner
                         phone
+                        pipefyId
+                        updatedAt
                       }
                     }""",
         "delete": """mutation deleteOrganization($input: DeleteOrganizationInput!) {
                     deleteOrganization(input: $input) {
-                      id
+                      _deleted
+                      _lastChangedAt
+                      _version
                       documentNumber
                       createdAt
-                      _version
-                      updatedAt
-                      pipefyId
-                      phone
+                      id
+                      image
+                      name
                       legalName
-                      _lastChangedAt
-                      _deleted
+                      owner
+                      phone
+                      pipefyId
+                      updatedAt
                     }
                   }
                 """
@@ -122,16 +148,19 @@ schemas = {
                   _deleted
                   _lastChangedAt
                   _version
-                  createdAt
                   documentNumber
                   email
                   id
+                  leadSimulationId
                   name
+                  memberId
                   organizationId
+                  owner
                   phone
                   pipefyId
+                  status
+                  type
                   updatedAt
-                  userId
                   value
                 }
               }""",
@@ -140,53 +169,62 @@ schemas = {
                       _deleted
                       _lastChangedAt
                       _version
-                      email
                       documentNumber
-                      createdAt
+                      email
                       id
+                      leadSimulationId
                       name
+                      memberId
                       organizationId
+                      owner
                       phone
                       pipefyId
+                      status
+                      type
                       updatedAt
-                      userId
                       value
                     }
                   }""",
         "update": """mutation updateLead($input: UpdateLeadInput!) {
                   updateLead(input: $input) {
-                    value
-                    userId
-                    pipefyId
-                    updatedAt
-                    phone
-                    name
-                    organizationId
+                    _deleted
+                    _lastChangedAt
+                    _version
+                    documentNumber
                     email
                     id
-                    documentNumber
-                    createdAt
-                    _version
-                    _lastChangedAt
-                    _deleted
+                    leadSimulationId
+                    name
+                    memberId
+                    organizationId
+                    owner
+                    phone
+                    pipefyId
+                    status
+                    type
+                    updatedAt
+                    value
                   }
                 }""",
         "delete": """mutation deleteLead($input: DeleteLeadInput!) {
                     deleteLead(input: $input) {
                       _deleted
-                      _version
-                      createdAt
                       _lastChangedAt
+                      _version
                       documentNumber
+                      email
+                      id
+                      leadSimulationId
                       name
+                      memberId
                       organizationId
+                      owner
                       phone
                       pipefyId
+                      status
+                      type
                       updatedAt
-                      userId
                       value
-                      id
-                      email
                     }
                   }"""
     },
@@ -196,64 +234,80 @@ schemas = {
                     _deleted
                     _lastChangedAt
                     _version
-                    birthDate
-                    createdAt
-                    documentNumber
-                    email
-                    id
-                    name
-                    organizationId
-                    phone
+                    welcome
+                    userId
                     updatedAt
+                    phone
+                    owner
+                    organizationId
+                    name
+                    id
+                    email
+                    documentNumber
+                    createdAt
+                    avatar
+                    birthDate
                   }
                 }
                 """,
         "create": """mutation createMember($input: CreateMemberInput!) {
                       createMember(input: $input) {
-                        _deleted
-                        _lastChangedAt
-                        _version
-                        birthDate
-                        createdAt
-                        documentNumber
-                        email
-                        id
-                        name
-                        organizationId
-                        phone
-                        updatedAt
-                      }
-                    }""",
-        "update": """mutation updateMember($input: UpdateMemberInput!) {
-                    updateMember(input: $input) {
+                      _deleted
+                      _lastChangedAt
+                      _version
+                      welcome
+                      userId
                       updatedAt
                       phone
+                      owner
                       organizationId
                       name
                       id
                       email
                       documentNumber
                       createdAt
+                      avatar
                       birthDate
-                      _version
-                      _lastChangedAt
+                      }
+                    }""",
+        "update": """mutation updateMember($input: UpdateMemberInput!) {
+                    updateMember(input: $input) {
                       _deleted
+                      _lastChangedAt
+                      _version
+                      welcome
+                      userId
+                      updatedAt
+                      phone
+                      owner
+                      organizationId
+                      name
+                      id
+                      email
+                      documentNumber
+                      createdAt
+                      avatar
+                      birthDate
                     }
                   }""",
         "delete": """mutation deleteMember($input: DeleteMemberInput!) {
                 deleteMember(input: $input) {
-                  _deleted
-                  _lastChangedAt
-                  _version
-                  createdAt
-                  birthDate
-                  documentNumber
-                  email
-                  id
-                  name
-                  organizationId
-                  phone
-                  updatedAt
+                    _deleted
+                    _lastChangedAt
+                    _version
+                    welcome
+                    userId
+                    updatedAt
+                    phone
+                    owner
+                    organizationId
+                    name
+                    id
+                    email
+                    documentNumber
+                    createdAt
+                    avatar
+                    birthDate
                 }
               }"""
     },
@@ -264,52 +318,80 @@ schemas = {
                     _lastChangedAt
                     _version
                     createdAt
+                    dayDue
+                    entranceValue
                     gracePeriod
+                    itbi
                     id
+                    legalPerson
                     linkPDFSimulation
-                    loanDate
+                    memberId
                     loanValue
-                    monthlyIncome
-                    owner
+                    loanDate
                     skipMonth
-                    updatedAt
                     propertyValue
+                    owner
+                    organizationId
+                    monthlyIncome
+                    updatedAt
+                    type
+                    term
+                    table
                   }
                 }
                 """,
         "create": """mutation createSimulation($input: CreateSimulationInput!) {
                     createSimulation (input: $input){
+                      _deleted
                       _lastChangedAt
                       _version
                       createdAt
-                      id
+                      dayDue
+                      entranceValue
                       gracePeriod
+                      itbi
+                      id
+                      legalPerson
                       linkPDFSimulation
-                      loanDate
-                      monthlyIncome
+                      memberId
                       loanValue
-                      owner
-                      propertyValue
+                      loanDate
                       skipMonth
+                      propertyValue
+                      owner
+                      organizationId
+                      monthlyIncome
                       updatedAt
+                      type
+                      term
+                      table
                     }
                   }""",
         "update": """mutation updateSimulation($input: UpdateSimulationInput!) {
                     updateSimulation(input: $input) {
+                      _deleted
+                      _lastChangedAt
+                      _version
+                      createdAt
+                      dayDue
+                      entranceValue
+                      gracePeriod
+                      itbi
+                      id
+                      legalPerson
+                      linkPDFSimulation
+                      memberId
+                      loanValue
+                      loanDate
                       skipMonth
                       propertyValue
                       owner
+                      organizationId
                       monthlyIncome
                       updatedAt
-                      loanValue
-                      loanDate
-                      linkPDFSimulation
-                      id
-                      gracePeriod
-                      createdAt
-                      _version
-                      _lastChangedAt
-                      _deleted
+                      type
+                      term
+                      table
                     }
                   }""",
         "delete": """mutation deleteSimulation($input: DeleteSimulationInput!) {
@@ -318,39 +400,48 @@ schemas = {
                         _lastChangedAt
                         _version
                         createdAt
+                        dayDue
+                        entranceValue
                         gracePeriod
+                        itbi
                         id
-                        updatedAt
+                        legalPerson
+                        linkPDFSimulation
+                        memberId
+                        loanValue
+                        loanDate
                         skipMonth
                         propertyValue
                         owner
+                        organizationId
                         monthlyIncome
-                        loanValue
-                        loanDate
-                        linkPDFSimulation
+                        updatedAt
+                        type
+                        term
+                        table
                       }
                     }"""
     },
     "WhiteLabel": {
         "get": """query getWhiteLabel($id: ID!) {
                         getWhiteLabel(id: $id) {
-                          _deleted
-                          _lastChangedAt
-                          _version
-                          active
-                          background
-                          createdAt
-                          id
-                          logo
-                          owner
-                          partnerName
-                          path
-                          primary
-                          secondary
-                          tertiary
-                          type
-                          updatedAt
-                          whiteLabelOrganizationId
+                            _deleted
+                            _lastChangedAt
+                            _version
+                            active
+                            background
+                            createdAt
+                            id
+                            logo
+                            owner
+                            partnerName
+                            path
+                            primary
+                            secondary
+                            tertiary
+                            type
+                            updatedAt
+                            whiteLabelOrganizationId
                         }
                       }
                 """,
@@ -358,72 +449,89 @@ schemas = {
           query listWhiteLabels {
                   listWhiteLabels {
                     items {
-                      whiteLabelOrganizationId
-                      updatedAt
-                      type
-                      tertiary
-                      secondary
-                      primary
-                      path
-                      partnerName
-                      owner
-                      logo
-                      id
-                      createdAt
-                      background
-                      active
-                      _version
-                      _lastChangedAt
-                      _deleted
+                        _deleted
+                        _lastChangedAt
+                        _version
+                        active
+                        background
+                        createdAt
+                        id
+                        logo
+                        owner
+                        partnerName
+                        path
+                        primary
+                        secondary
+                        tertiary
+                        type
+                        updatedAt
+                        whiteLabelOrganizationId
                     }
                   }
                 }
         """,
         "create": """mutation CreateWhiteLabel($input: CreateWhiteLabelInput!) {
                       createWhiteLabel(input: $input) {
-                        tertiary
-                        type
-                        updatedAt
-                        whiteLabelOrganizationId
-                        secondary
-                        primary
-                        path
-                        partnerName
-                        owner
-                        logo
-                        id
-                        createdAt
-                        background
-                        active
-                        _version
-                        _lastChangedAt
-                        _deleted
+                            _deleted
+                            _lastChangedAt
+                            _version
+                            active
+                            background
+                            createdAt
+                            id
+                            logo
+                            owner
+                            partnerName
+                            path
+                            primary
+                            secondary
+                            tertiary
+                            type
+                            updatedAt
+                            whiteLabelOrganizationId
                       }
                     }
                     """,
         "update": """mutation MyMutation($input: UpdateWhiteLabelInput!) {
                 updateWhiteLabel(input: $input) {
-                  updatedAt
-                  type
-                  tertiary
-                  secondary
-                  primary
-                  path
-                  partnerName
-                  owner
-                  logo
-                  id
-                  createdAt
-                  background
-                  active
-                  _version
-                  _lastChangedAt
-                  _deleted
+                            _deleted
+                            _lastChangedAt
+                            _version
+                            active
+                            background
+                            createdAt
+                            id
+                            logo
+                            owner
+                            partnerName
+                            path
+                            primary
+                            secondary
+                            tertiary
+                            type
+                            updatedAt
+                            whiteLabelOrganizationId
                 }
               }""",
         "delete": """mutation MyMutation($input: DeleteWhiteLabelInput!) {
                     deleteWhiteLabel(input: $input){
-                      id
+                            _deleted
+                            _lastChangedAt
+                            _version
+                            active
+                            background
+                            createdAt
+                            id
+                            logo
+                            owner
+                            partnerName
+                            path
+                            primary
+                            secondary
+                            tertiary
+                            type
+                            updatedAt
+                            whiteLabelOrganizationId
                     }
                   }
                 """
