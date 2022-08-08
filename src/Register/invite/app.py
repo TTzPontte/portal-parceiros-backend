@@ -1,30 +1,30 @@
-from common.dao.graphql.gql_dao import GqlDAO
+from common.dao_pkg.graphql import UserInviteDAO, MemberDAO
 import json
 
 
 def update_status_userinvite(token, uuid, status):
-    simulation = GqlDAO(authorization=token, table_name='UserInvite')
+    user_invite_dao = UserInviteDAO(authorization=token)
 
-    return simulation.update(uuid, {"status": status})
+    return user_invite_dao.update(uuid, {"status": status})
 
 
 def update_user_id_member(token, uuid, user_id):
-    simulation = GqlDAO(authorization=token, table_name='Member')
+    member_dao = MemberDAO(authorization=token)
 
-    return simulation.update(uuid, {"userId": user_id})
+    return member_dao.update(uuid, {"userId": user_id})
 
 
-def lambda_handler(event, context):
+def lambda_handler(event, _context):
     try:
         body = event.get('body')
-        requestContext = event.get('requestContext')
+        request_context = event.get('requestContext')
         token = event["headers"]["Authorization"]
 
         payload = json.loads(body) if isinstance(body, str) else body
 
         action = payload.get('action')
         user_invite_id = payload.get('userInviteId')
-        user_id = requestContext["authorizer"]["claims"]["sub"]
+        user_id = request_context["authorizer"]["claims"]["sub"]
 
         user_invite = update_status_userinvite(token, user_invite_id, action)
 

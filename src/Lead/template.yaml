@@ -51,6 +51,7 @@ Globals:
     Tags:
       Project: !Ref Project
       Environment: !Ref Environment
+      APP_SYNC_API_ID: !Sub "{{resolve:ssm:/portalparceirofrontend/appsync/id/${Environment}:1}}"  
   Api:
     Cors:
       AllowMethods: "'*'"

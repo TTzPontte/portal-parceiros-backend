@@ -9,11 +9,12 @@ from botocore import exceptions as boto_exceptions
 dynamodb = boto_resource("dynamodb")
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+
 def logger_warning(exc):
     logger.warning("não foi possivel recuperar o recurso: %s", exc, exc_info=1)
 
 @dataclass
-class DynamoDAO:
+class BaseDAO:
     table_name: str
 
     def __post_init__(self):

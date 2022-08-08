@@ -1,9 +1,8 @@
-from common.dao.dynamo.dynamo_dao import DynamoDAO
-from common.parameters.ssm_parameters import SSMParameters
-from common.dao.cognito.cognito_dao import CognitoDao
+from common.dao_pkg.cognito.cognito_dao import CognitoDao
+from common.dao_pkg.dynamo import UserInviteDAO
 
 
-def lambda_handler(event, context):
+def lambda_handler(event, _context):
 
     try:
         
@@ -13,11 +12,8 @@ def lambda_handler(event, context):
     
         user_invite_id = client_metadata.get('userInviteId', None)
         username = user_attributes.get('sub', None)
-      
-        sam = SSMParameters()
-        user_invite_table_name = sam.get_user_invite_table_name()
 
-        user_invite_dao = DynamoDAO(user_invite_table_name)
+        user_invite_dao = UserInviteDAO()
 
         user_invite = user_invite_dao.get(key="id", value=user_invite_id)
 

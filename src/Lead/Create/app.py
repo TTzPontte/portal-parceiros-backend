@@ -12,6 +12,7 @@ def lambda_handler(event, context):
     # data = event['body']
 
     response = table.put_item(Item=data)
+    
     return {
         'statusCode': 201,
         'headers': {

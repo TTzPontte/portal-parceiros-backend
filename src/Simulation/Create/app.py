@@ -1,14 +1,15 @@
-from common.dao.graphql.gql_dao import GqlDAO
+from common.dao_pkg.graphql import SimulationDAO
 import json 
 
-def lambda_handler(event, context):
+
+def lambda_handler(event, _context):
     try:
         body = event.get('body', None) 
         token = event["headers"]["Authorization"]
 
         payload = json.loads(body) if isinstance(body, str) else body
        
-        simulation = GqlDAO(authorization=token, table_name='Simulation')  
+        simulation = SimulationDAO(authorization=token)
  
         response = simulation.create(payload) 
     

@@ -10,8 +10,9 @@ logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 def logger_warning(exc):
     logger.warning("não foi possivel manipular o recurso: %s", exc, exc_info=1)
 
+
 @dataclass
-class GqlClient():
+class GqlClient:
     ssm_parameters = SSMParameters()
     authorization: str
 
@@ -19,7 +20,7 @@ class GqlClient():
         try:
             url: str = self.ssm_parameters.get_graphql_url_portal()
 
-            headers: str = {
+            headers: dict = {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
                 "Authorization": self.authorization
@@ -36,9 +37,9 @@ class GqlClient():
             if not response["data"]:
                 return None
 
-            def formatData(data): return data[list(data.keys())[0]]
+            def format_data(data): return data[list(data.keys())[0]]
 
-            return formatData(response["data"])
+            return format_data(response["data"])
 
         except Exception as err:
             logger_warning(f'GqlClient: {err}')

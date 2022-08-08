@@ -49,6 +49,7 @@ Globals:
       Variables:
         PAERTNERS_DB: "Organization-aou76nv52bapbebq3uxerkfcce-staging"
         API_ENDPOINT: !If [ Prod, 'api-parcerias.pontte.com.br', !Sub 'api-${Environment}-parcerias.pontte.com.br' ]
+        APP_SYNC_API_ID: !Sub "{{resolve:ssm:/portalparceirofrontend/appsync/id/${Environment}:1}}"    
     Tags:
       Project: !Ref Project
       Environment: !Ref Environment

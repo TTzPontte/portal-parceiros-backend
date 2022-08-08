@@ -1,12 +1,12 @@
 from dataclasses import dataclass
-from common.dao.graphql.schemas import schemas
-from common.dao.graphql.gql_client import GqlClient
+from common.dao_pkg.graphql.schemas import schemas
+from common.dao_pkg.graphql.gql_client import GqlClient
 
 
 @dataclass
-class GqlDAO:
-    table_name: str
+class BaseDAO:
     authorization: str
+    table_name: str
 
     def __post_init__(self):
         self._client = GqlClient(self.authorization)
@@ -21,12 +21,12 @@ class GqlDAO:
         if "_deleted" not in response:
             raise Exception("get feature needs '_deleted' field")
 
-        if response["_deleted"] == True:
+        if response["_deleted"]:
             return None
 
         return response
 
-    def getAll(self):
+    def get_all(self):
         response = self._client.post(self._schema["list"], {})
         
         return response
