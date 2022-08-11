@@ -1,5 +1,6 @@
-from common.dao.graphql.gql_dao import GqlDAO
+from common.dao_pkg.graphql import SimulationDAO
 import json 
+
 
 def lambda_handler(event, context):
     try:
@@ -10,7 +11,7 @@ def lambda_handler(event, context):
         if not uuid:
             raise Exception("field 'id' not found in path parameters") 
        
-        simulation = GqlDAO(authorization=token, table_name='Simulation')  
+        simulation = SimulationDAO(authorization=token)
  
         simulation.delete(uuid) 
     

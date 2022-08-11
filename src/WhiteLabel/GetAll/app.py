@@ -1,13 +1,14 @@
-from common.dao.graphql.gql_dao import GqlDAO
+from common.dao_pkg.graphql import WhiteLabelDAO
 import json 
 
-def lambda_handler(event, context):
+
+def lambda_handler(event, _context):
     try:
         token = event["headers"]["Authorization"]
        
-        whitelabel = GqlDAO(authorization=token, table_name='WhiteLabel')   
+        whitelabel = WhiteLabelDAO(authorization=token)
  
-        response = whitelabel.getAll()
+        response = whitelabel.get_all()
     
         return {
             'statusCode': 200,

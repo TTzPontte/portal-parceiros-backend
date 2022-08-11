@@ -1,7 +1,8 @@
-from common.dao.graphql.gql_dao import GqlDAO
+from common.dao_pkg.graphql import SimulationDAO
 import json 
 
-def lambda_handler(event, context):
+
+def lambda_handler(event, _context):
     try:
         path_parameters = event.get('pathParameters', None)
         uuid = path_parameters.get('id')
@@ -10,7 +11,7 @@ def lambda_handler(event, context):
         if not uuid:
             raise Exception("field 'id' not found in path parameters") 
        
-        simulation = GqlDAO(authorization=token, table_name='Simulation')   
+        simulation = SimulationDAO(authorization=token)
  
         response = simulation.get(uuid) 
     

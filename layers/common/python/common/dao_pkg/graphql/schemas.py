@@ -1,4 +1,3 @@
-
 schemas = {
     "UserInvite": {
         "get":  """query getUserInvite($id: ID!) {
@@ -535,5 +534,67 @@ schemas = {
                     }
                   }
                 """
+    },
+    "User": {
+        "get": """
+            query GetUser($id: ID!) {
+                  getUser(id: $id) {
+                    _deleted
+                    _lastChangedAt
+                    _version
+                    createdAt
+                    email
+                    id
+                    name
+                    updatedAt
+                    welcome
+                  }
+                }
+        """,
+        "create": """
+            mutation CreateUser($input: CreateUserInput!) {
+                  createUser(input: $input) {
+                    _deleted
+                    _lastChangedAt
+                    _version
+                    createdAt
+                    email
+                    id
+                    name
+                    updatedAt
+                    welcome
+                  }
+                }
+        """,
+        "update": """
+            mutation UpdateUser($input: UpdateUserInput!) {
+              updateUser(input: $input) {
+                welcome
+                updatedAt
+                name
+                id
+                email
+                createdAt
+                _version
+                _lastChangedAt
+                _deleted
+              }
+            }
+        """,
+        "delete": """
+            mutation DeleteUser($input: DeleteUserInput!) {
+              deleteUser(input: $input) {
+                welcome
+                updatedAt
+                name
+                id
+                email
+                createdAt
+                _version
+                _lastChangedAt
+                _deleted
+              }
+            }
+        """
     }
 }
