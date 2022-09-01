@@ -74,10 +74,6 @@ Resources:
     Properties:
       Name: !Sub "${Project}-WhiteLabelApi-${Environment}"
       StageName: !If [ Prod, !Ref StageName, !Ref Environment ]
-      Auth:
-        Authorizers:
-          CognitoAuthorizer:
-              UserPoolArn: !Ref CognitoUserPoolArn
       GatewayResponses:
         DEFAULT_4xx:
           ResponseParameters:
@@ -120,9 +116,8 @@ Resources:
             Path: "/v1/whitelabel"
             Method: GET
             RestApiId: !Ref WhiteLabelApi
-            Auth:
-              Authorizer: CognitoAuthorizer
       Policies:
         - SSMParameterReadPolicy:
             ParameterName: !Sub "portalparceirofrontend/api/${Environment}"
-
+        - DynamoDBReadPolicy:
+            TableName: !Sub "WhiteLabel-{{resolve:ssm:/portalparceirofrontend/appsync/id/${Environment}:1}}-${Environment}"
