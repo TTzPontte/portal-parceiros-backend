@@ -1,21 +1,20 @@
-from common.dao_pkg.graphql import WhiteLabelDAO
+from common.dao_pkg.dynamo import WhiteLabelDAO
 import json 
 
 
 def lambda_handler(event, _context):
     try:
-        token = event["headers"]["Authorization"]
        
-        whitelabel = WhiteLabelDAO(authorization=token)
+        whitelabel = WhiteLabelDAO()
  
-        response = whitelabel.get_all()
-    
+        response = whitelabel.scan("active = :active", {":active": True})
+
         return {
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
             },
-            'body': json.dumps(response)
+            'body': json.dumps(response, default=str)
         }
     except Exception as err:
         print(err)
